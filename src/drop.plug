@@ -1,0 +1,3 @@
+[Plugin]
+Name=Drop
+File=libpantheon-files-drop.so
