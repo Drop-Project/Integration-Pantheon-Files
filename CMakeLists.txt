@@ -8,7 +8,7 @@ project (pantheon-files-drop)
 include (GNUInstallDirs)
 set (PKGDATADIR "${DATADIR}")
 set (GETTEXT_PACKAGE "${CMAKE_PROJECT_NAME}-plugin")
-set (PLUGIN_DIR "${CMAKE_INSTALL_PREFIX}/lib/pantheon-files/plugins")
+set (PLUGIN_DIR "${CMAKE_INSTALL_PREFIX}/lib/x86_64-linux-gnu/pantheon-files/plugins")
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 # Gettext
