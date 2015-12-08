@@ -34,21 +34,27 @@ public class Drop.Plugin : Marlin.Plugins.Base {
 
     private void enhance_menu (Gtk.Menu menu, List<GOF.File> files) {
         Gtk.MenuItem drop_menu_item = new Gtk.MenuItem.with_label (_("Send to…"));
-        Gtk.Menu drop_submenu = new Gtk.Menu ();
-
         try {
             Drop.TransmissionPartner[] transmission_partners = session.get_transmission_partners (false);
 
-            foreach (Drop.TransmissionPartner transmission_partner in transmission_partners) {
-                Gtk.MenuItem partner_menu_item = new Gtk.MenuItem.with_label ((transmission_partner.display_name));
-                partner_menu_item.activate.connect (() => {
-                    start_transmission (transmission_partner, files);
+            if (transmission_partners.length > 0) {
+                Gtk.Menu drop_submenu = new Gtk.Menu ();
+
+                foreach (Drop.TransmissionPartner transmission_partner in transmission_partners) {
+                    Gtk.MenuItem partner_menu_item = new Gtk.MenuItem.with_label (transmission_partner.display_name);
+                    partner_menu_item.activate.connect (() => {
+                        start_transmission (transmission_partner, files);
+                    });
+
+                    add_menu_item (drop_submenu, partner_menu_item);
+                }
+
+                drop_menu_item.set_submenu (drop_submenu);
+            } else {
+                drop_menu_item.activate.connect (() => {
+                    show_drop_dialog (files);
                 });
-
-                add_menu_item (drop_submenu, partner_menu_item);
             }
-
-            drop_menu_item.set_submenu (drop_submenu);
 
             add_menu_item (menu, new Gtk.SeparatorMenuItem ());
             add_menu_item (menu, drop_menu_item);
@@ -71,6 +77,19 @@ public class Drop.Plugin : Marlin.Plugins.Base {
         } catch (Error e) {
             warning ("Starting transmission failed: %s", e.message);
         }
+    }
+
+    private void show_drop_dialog (List<GOF.File> files) {
+        File[] parameter_files = {};
+
+        foreach (GOF.File file in files) {
+            if (file.file_type == FileType.REGULAR) {
+                parameter_files += file.location;
+            }
+        }
+
+        File drop_dialog_executable = File.new_for_commandline_arg ("/usr/bin/drop-dialog");
+        Granite.Services.System.launch_with_files (drop_dialog_executable, parameter_files);
     }
 
     private void add_menu_item (Gtk.Menu menu, Gtk.MenuItem menu_item) {
