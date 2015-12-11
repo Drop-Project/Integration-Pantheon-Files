@@ -40,7 +40,13 @@ public class Drop.Plugin : Marlin.Plugins.Base {
             if (transmission_partners.length > 0) {
                 Gtk.Menu drop_submenu = new Gtk.Menu ();
 
-                foreach (Drop.TransmissionPartner transmission_partner in transmission_partners) {
+                for (int i = 0; i < transmission_partners.length; i++) {
+                    if (i >= 5) {
+                        break;
+                    }
+
+                    Drop.TransmissionPartner transmission_partner = transmission_partners[i];
+
                     Gtk.MenuItem partner_menu_item = new Gtk.MenuItem.with_label (transmission_partner.display_name);
                     partner_menu_item.activate.connect (() => {
                         start_transmission (transmission_partner, files);
@@ -48,6 +54,14 @@ public class Drop.Plugin : Marlin.Plugins.Base {
 
                     add_menu_item (drop_submenu, partner_menu_item);
                 }
+
+                Gtk.MenuItem others_menu_item = new Gtk.MenuItem.with_label (_("Others…"));
+                others_menu_item.activate.connect (() => {
+                    show_drop_dialog (files);
+                });
+
+                add_menu_item (drop_submenu, new Gtk.SeparatorMenuItem ());
+                add_menu_item (drop_submenu, others_menu_item);
 
                 drop_menu_item.set_submenu (drop_submenu);
             } else {
@@ -80,16 +94,15 @@ public class Drop.Plugin : Marlin.Plugins.Base {
     }
 
     private void show_drop_dialog (List<GOF.File> files) {
-        File[] parameter_files = {};
+        string command = "drop-dialog";
 
         foreach (GOF.File file in files) {
             if (file.file_type == FileType.REGULAR) {
-                parameter_files += file.location;
+                command += " %s".printf (file.location.get_path ().replace (" ", "\\ "));
             }
         }
 
-        File drop_dialog_executable = File.new_for_commandline_arg ("/usr/bin/drop-dialog");
-        Granite.Services.System.launch_with_files (drop_dialog_executable, parameter_files);
+        Granite.Services.System.execute_command (command);
     }
 
     private void add_menu_item (Gtk.Menu menu, Gtk.MenuItem menu_item) {
