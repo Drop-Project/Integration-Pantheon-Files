@@ -9,3 +9,6 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 make
 sudo make install
 ```
+
+## Translations
+Please help us translating this project! [https://translations.launchpad.net/drop](https://translations.launchpad.net/drop)
